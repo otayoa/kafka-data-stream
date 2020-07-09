@@ -22,10 +22,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class TwitterProducer {
-    private final String consumerKey = "ii1Zm45uqU3HQkLrJbw7oKF4Q";
-    private final String consumerSecret = "B2HedPMbiYUgfdy7o2O02wTBdW9ss4mXU41wQZDxScRgcEFjBa";
-    private final String token = "431000969-0j4QLTol6uQHK4gw3apR8tuDQtk7wWd4deDgPtZr";
-    private final String secret = "D7xfLVh8UDLBBooI8gAJlpiVTyCAVkmRisnBGAYQd3e8b";
+    // replace placeholder values.
+    private final String consumerKey = "[consumerKey]"; 
+    private final String consumerSecret = "[consumerSecret]";
+    private final String token = "[token]";
+    private final String secret = "[secret]";
     private Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 
 
