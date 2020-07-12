@@ -1,4 +1,4 @@
-package kafka.tutorial2;
+package kafka.twitter;
 
 import com.google.common.collect.Lists;
 import com.twitter.hbc.ClientBuilder;
@@ -15,6 +15,8 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
@@ -22,19 +24,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class TwitterProducer {
-    private final String consumerKey = "ii1Zm45uqU3HQkLrJbw7oKF4Q";
-    private final String consumerSecret = "B2HedPMbiYUgfdy7o2O02wTBdW9ss4mXU41wQZDxScRgcEFjBa";
-    private final String token = "431000969-0j4QLTol6uQHK4gw3apR8tuDQtk7wWd4deDgPtZr";
-    private final String secret = "D7xfLVh8UDLBBooI8gAJlpiVTyCAVkmRisnBGAYQd3e8b";
     private Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 
-
     public TwitterProducer(){}
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         new TwitterProducer().run();
     }
 
-    public void run(){
+    public void run() throws IOException {
         logger.info("Setup");
         /** Set up your blocking queues: Be sure to size these properly based on expected TPS of your stream */
         BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(1000);
@@ -81,7 +78,23 @@ public class TwitterProducer {
         }
     }
 
-    public Client createTwitterClient(BlockingQueue<String> msgQueue){
+    public Client createTwitterClient(BlockingQueue<String> msgQueue) throws IOException {
+        String consumerKey = "";
+        String consumerSecret = "";
+        String token = "";
+        String secret = "";
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            Properties prop = new Properties();
+            if (inputStream != null)
+                prop.load(inputStream);
+            consumerKey = prop.getProperty("consumerKey");
+            consumerSecret = prop.getProperty("consumerSecret");
+            token = prop.getProperty("token");
+            secret = prop.getProperty("secret");
+        } catch (Exception e) {
+            logger.error("config.properties not found");
+        }
+
         /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
         StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
@@ -101,9 +114,7 @@ public class TwitterProducer {
                 .processor(new StringDelimitedProcessor(msgQueue));
 
 
-        Client hosebirdClient = builder.build();
-
-        return hosebirdClient;
+        return builder.build();
     }
 
     public KafkaProducer<String, String > createKafkaProducer(){
@@ -128,8 +139,7 @@ public class TwitterProducer {
 
 
         // create the producer
-        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
-        return producer;
+        return new KafkaProducer<String, String>(properties);
     }
 
 
