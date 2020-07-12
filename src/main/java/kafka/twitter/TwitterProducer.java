@@ -24,6 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class TwitterProducer {
+
     private Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 
     public TwitterProducer(){}
